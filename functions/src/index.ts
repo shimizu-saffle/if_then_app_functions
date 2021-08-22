@@ -3,7 +3,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 admin.initializeApp();
 
-// Firestoreからイフゼンプランの情報を取得して返す関数
+// HTTPリクエストをトリガーに Cloud Firestore のイフゼンプランの情報を取得して返す関数
 export const fetchIfThen = functions.https.onRequest(
     async (request, response) => {
         try {
@@ -27,4 +27,3 @@ export const fetchIfThen = functions.https.onRequest(
         }
     }
 );
-// test

@@ -27,3 +27,4 @@ export const fetchIfThen = functions.https.onRequest(
         }
     }
 );
+// test

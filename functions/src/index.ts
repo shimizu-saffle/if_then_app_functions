@@ -3,18 +3,16 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 admin.initializeApp(functions.config().functions);
 
-let newIfThen;
-
-// HTTPリクエストをトリガーに Cloud Firestore のイフゼンプランの情報を取得して返す関数
-export const onCreateNotification = functions
+// イフゼンプランのonCreateをトリガーに Cloud Firestore のイフゼンプランの情報を取得して返す関数
+export const onCreateNotification2 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
-    .onCreate(async (snapshot, context) => {
+    .onCreate(async (snapshot) => {
         const fcmTokens = [];
 
-        newIfThen = snapshot.data();
-        const newIfText = newIfThen.data()["ifText"];
-        const newThenText = newIfThen.data()["thenText"];
+        const newIfThen = snapshot.data();
+        // const newIfText = newIfThen.doc("ifText");
+        // const newThenText = newIfThen.data()["thenText"];
 
         const tokens = await admin.firestore().collection("users").get();
 
@@ -24,9 +22,13 @@ export const onCreateNotification = functions
 
         const payload = {
             notification: {
-                title: newIfText,
-                body: newThenText,
+                title: "Push Title",
+                body: "Push Body",
                 sound: "default",
+            },
+            date: {
+                click_action: "FULUTTER_NOTIFICATION_CLICK",
+                message: newIfThen.message,
             },
         };
         try {

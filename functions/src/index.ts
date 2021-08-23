@@ -4,21 +4,27 @@ import * as admin from "firebase-admin";
 admin.initializeApp(functions.config().functions);
 
 // イフゼンプランのonCreateをトリガーに Cloud Firestore のイフゼンプランの情報を取得して返す関数
-export const onCreateNotification2 = functions
+export const onCreateNotification3 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
     .onCreate(async (snapshot) => {
-        const fcmTokens = [];
+        // 関数は発火してるのでここまでの記述は問題ないはず
+
+        // const fcmTokens = [];
 
         const newIfThen = snapshot.data();
         // const newIfText = newIfThen.doc("ifText");
         // const newThenText = newIfThen.data()["thenText"];
 
-        const tokens = await admin.firestore().collection("users").get();
+        // const tokens = await admin.firestore().collection("users").get();
+        // トークンべた書きも送れなかった
+        const tokens = [
+            "eOHxYMFAHUjguDS1UsTg41:APA91bEaitT55pJFP2MrCh5iaF12_bzh-qVqVbyRNNelKasLyhbuXmuRSGEL1yi-BdNSoM18st8xxg8IDxohDbmmrOAcI-t7fNN5QIUUV4N4IfIWWgXoqd8ZeraaBJSR1xMREdwLvGEB",
+        ];
 
-        for (const token of tokens.docs) {
-            fcmTokens.push(token.data()._tokens);
-        }
+        // for (const token of tokens.docs) {
+        //     fcmTokens.push(token.data()._tokens);
+        // }
 
         const payload = {
             notification: {
@@ -34,7 +40,7 @@ export const onCreateNotification2 = functions
         try {
             const response = await admin
                 .messaging()
-                .sendToDevice(fcmTokens, payload);
+                .sendToDevice(tokens, payload);
             console.log("Notification sent succsessfully", response);
         } catch (err) {
             console.log("Error sending Notification.");

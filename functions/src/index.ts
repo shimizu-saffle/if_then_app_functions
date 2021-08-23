@@ -1,29 +1,40 @@
 import * as functions from "firebase-functions";
 // セキュリティルールを無視できる管理者権限でアクセスするためのインポートとイニシャライズ
 import * as admin from "firebase-admin";
-admin.initializeApp();
+admin.initializeApp(functions.config().functions);
+
+let newIfThen;
 
 // HTTPリクエストをトリガーに Cloud Firestore のイフゼンプランの情報を取得して返す関数
-export const fetchIfThen = functions.https.onRequest(
-    async (request, response) => {
-        try {
-            // Firestoreへのアクセス情報を作る
-            const db = admin.firestore();
-            const doc = await db
-                .collection("itList")
-                // ドキュメントIDをベタ書きしてる
-                .doc("H4zImloSqTgNZfXqYVkx")
-                .get();
-            // doc.data()で値が取得できる
-            const ifThenInfo = doc.data();
-            // イフゼンプランの情報を戻り値として返す
-            response.send(ifThenInfo);
-            // データベースから値の取得に失敗した際のエラーを防ぐために
-            // try, catchでエラーハンドリングする
-        } catch (e) {
-            console.error(e);
-            // こう書いておくとステータスコードを返却できる
-            response.status(500).send(e);
+export const onCreateNotification = functions
+    .region("asia-northeast1")
+    .firestore.document("itList/{docId}")
+    .onCreate(async (snapshot, context) => {
+        const fcmTokens = [];
+
+        newIfThen = snapshot.data();
+        const newIfText = newIfThen.data()["ifText"];
+        const newThenText = newIfThen.data()["thenText"];
+
+        const tokens = await admin.firestore().collection("users").get();
+
+        for (const token of tokens.docs) {
+            fcmTokens.push(token.data()._tokens);
         }
-    }
-);
+
+        const payload = {
+            notification: {
+                title: newIfText,
+                body: newThenText,
+                sound: "default",
+            },
+        };
+        try {
+            const response = await admin
+                .messaging()
+                .sendToDevice(fcmTokens, payload);
+            console.log("Notification sent succsessfully", response);
+        } catch (err) {
+            console.log("Error sending Notification.");
+        }
+    });

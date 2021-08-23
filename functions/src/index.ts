@@ -26,14 +26,16 @@ const sendPushNotification = function (
 };
 
 // 新規依頼作時
-export const createItList = functions
+export const createItList2 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
     .onCreate(async (snapshot, context) => {
         // ここにitListのデータが入っている(createdAt,ifText,thenText)
+
         const itList = snapshot.data();
 
         const receiverRef = firestore.collection("users").doc(itList["userId"]);
+        // const receiverTokens =
         // 受信者の情報にアクセスする
         receiverRef.get().then(function (doc) {
             if (doc.exists === true) {
@@ -48,9 +50,9 @@ export const createItList = functions
                 // 通知の内容
                 const body = thenText;
                 sendPushNotification(fcmToken, title, body, "1");
-                console.log("newitList");
+                console.log(ifText + thenText);
             } else {
-                console.log("notExists");
+                console.error("notExists");
             }
         });
     });

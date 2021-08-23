@@ -5,7 +5,7 @@ export const firestore = admin.firestore();
 
 // プッシュ通知を送る関数
 const sendPushNotification = async function (
-    token: string,
+    token: string[],
     title: string,
     body: string,
     badge: string
@@ -26,30 +26,29 @@ const sendPushNotification = async function (
 };
 
 // 新規依頼作時
-export const createItList3 = functions
+export const createItList4 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
     .onCreate(async (snapshot, context) => {
         // ここにitListのデータが入っている(createdAt,ifText,thenText)
-
         const itList = snapshot.data();
 
         const receiverRef = firestore.collection("users").doc(itList["userId"]);
-        // const receiverTokens =
-        // 受信者の情報にアクセスする
+        const allTokens = receiverRef.collection("tokens").get();
+        const tokens = (await allTokens).docs.map((doc) => doc.id);
+
         receiverRef.get().then(function (doc) {
             if (doc.exists === true) {
-                // 受信者の情報を取得(name,fcmToken)
+                // 受信者の情報を取得(name,fcmTokens)
                 // const receiver = doc.data();
-                const fcmToken =
-                    "eOHxYMFAHUjguDS1UsTg41:APA91bEaitT55pJFP2MrCh5iaF12_bzh-qVqVbyRNNelKasLyhbuXmuRSGEL1yi-BdNSoM18st8xxg8IDxohDbmmrOAcI-t7fNN5QIUUV4N4IfIWWgXoqd8ZeraaBJSR1xMREdwLvGEB";
+                const fcmTokens = tokens;
                 const ifText = itList["ifText"];
                 const thenText = itList["thenText"];
                 // 通知のタイトル
                 const title = ifText;
                 // 通知の内容
                 const body = thenText;
-                sendPushNotification(fcmToken, title, body, "1");
+                sendPushNotification(fcmTokens, title, body, "1");
                 console.log(ifText + thenText);
             } else {
                 console.error("notExists");

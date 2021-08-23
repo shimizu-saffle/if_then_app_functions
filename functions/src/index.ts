@@ -4,7 +4,7 @@ admin.initializeApp(functions.config().firebase);
 export const firestore = admin.firestore();
 
 // プッシュ通知を送る関数
-const sendPushNotification = function (
+const sendPushNotification = async function (
     token: string,
     title: string,
     body: string,
@@ -22,11 +22,11 @@ const sendPushNotification = function (
         priority: "high",
     };
     // ここで実際に通知を送信している
-    admin.messaging().sendToDevice(token, payload, option);
+    await admin.messaging().sendToDevice(token, payload, option);
 };
 
 // 新規依頼作時
-export const createItList2 = functions
+export const createItList3 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
     .onCreate(async (snapshot, context) => {

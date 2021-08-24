@@ -24,7 +24,7 @@ const sendPushNotification = async function (
     await admin.messaging().sendToDevice(token, payload, option);
 };
 
-export const remindIfThenNotificationTest2 = functions
+export const remindIfThenNotificationTest3 = functions
     .region("asia-northeast1")
     .runWith({ memory: "512MB" })
     .pubsub.schedule("every 2 minutes")
@@ -48,13 +48,20 @@ export const remindIfThenNotificationTest2 = functions
             return;
         }
 
-        usersSnapshot.forEach((doc) => {
+        usersSnapshot.forEach(async (doc) => {
             // Functionsのログにユーザーのメールアドレスとトークンが表示されてる
             console.log(doc.id, "=>", doc.data());
             console.log(doc.data()["postAt"]);
             const tokens = doc.data()["tokens"];
+            const uid = doc.id;
 
-            itListSnapshot.forEach((doc) => {
+            const ifThenRefUsers = await AllIfThenInfo.where(
+                "userId",
+                "==",
+                uid
+            ).get();
+
+            ifThenRefUsers.forEach((doc) => {
                 console.log(doc.id, "=>", doc.data());
                 console.log(doc.data()["postAt"]);
 

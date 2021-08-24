@@ -20,10 +20,11 @@ const sendPushNotification = async function (
     const option = {
         priority: "high",
     };
-    // ここで実際に通知を送信している
+    // ここで通知を送信している
     await admin.messaging().sendToDevice(token, payload, option);
 };
 
+// Cloud Functionsにデプロイ済み
 export const remindIfThenNotification12 = functions
     .region("asia-northeast1")
     .runWith({ memory: "512MB" })
@@ -31,7 +32,6 @@ export const remindIfThenNotification12 = functions
     .timeZone("Asia/Tokyo")
     .onRun(async () => {
         // user全員に対して通知を送るための記述
-        // まずは複数のユーザーにべた書きメッセで通知を送れるかテストする→テスト完了
 
         const pushUsersRef = firestore.collection("users");
         const AllIfThenInfo = firestore.collection("itList");
@@ -67,7 +67,7 @@ export const remindIfThenNotification12 = functions
 
                 const title = doc.data()["ifText"];
                 const body = doc.data()["thenText"];
-                // この関数で通知を送信してる
+
                 sendPushNotification(tokens, title, body, "1");
             });
         });

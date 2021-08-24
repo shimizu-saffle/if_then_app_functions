@@ -24,10 +24,10 @@ const sendPushNotification = async function (
     await admin.messaging().sendToDevice(token, payload, option);
 };
 
-export const remindIfThenNotificationTest3 = functions
+export const remindIfThenNotification12 = functions
     .region("asia-northeast1")
     .runWith({ memory: "512MB" })
-    .pubsub.schedule("every 2 minutes")
+    .pubsub.schedule("0 12 * * *")
     .timeZone("Asia/Tokyo")
     .onRun(async () => {
         // user全員に対して通知を送るための記述

@@ -3,6 +3,8 @@ import * as admin from "firebase-admin";
 admin.initializeApp(functions.config().firebase);
 export const firestore = admin.firestore();
 
+export * from "./ifthen_pubsub";
+
 // プッシュ通知を送る関数
 const sendPushNotification = async function (
     token: string[],
@@ -26,10 +28,10 @@ const sendPushNotification = async function (
 };
 
 // 新規依頼作時
-export const createItList5 = functions
+export const createItList6 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
-    .onCreate(async (snapshot, context) => {
+    .onCreate(async (snapshot) => {
         // ここにitListのデータが入っている(createdAt,ifText,thenText)
         const itList = snapshot.data();
 

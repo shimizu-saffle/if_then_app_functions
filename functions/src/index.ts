@@ -26,7 +26,7 @@ const sendPushNotification = async function (
 };
 
 // 新規依頼作時
-export const createItList4 = functions
+export const createItList5 = functions
     .region("asia-northeast1")
     .firestore.document("itList/{docId}")
     .onCreate(async (snapshot, context) => {
@@ -34,14 +34,14 @@ export const createItList4 = functions
         const itList = snapshot.data();
 
         const receiverRef = firestore.collection("users").doc(itList["userId"]);
-        const allTokens = receiverRef.collection("tokens").get();
-        const tokens = (await allTokens).docs.map((doc) => doc.id);
+        // const userSnapshot = receiverRef.collection("users").get();
+        // const tokens = (await userSnapshot).docs.map((doc) => doc.id);
 
         receiverRef.get().then(function (doc) {
             if (doc.exists === true) {
-                // 受信者の情報を取得(name,fcmTokens)
-                // const receiver = doc.data();
-                const fcmTokens = tokens;
+                // usersの情報を取得(name,fcmTokens)
+                const receiver = doc.data()!;
+                const fcmTokens = receiver["tokens"];
                 const ifText = itList["ifText"];
                 const thenText = itList["thenText"];
                 // 通知のタイトル

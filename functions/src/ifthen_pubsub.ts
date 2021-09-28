@@ -31,8 +31,6 @@ export const remindIfThenNotification12 = functions
     .pubsub.schedule("0 12 * * *")
     .timeZone("Asia/Tokyo")
     .onRun(async () => {
-        // user全員に対して通知を送るための記述
-
         const pushUsersRef = firestore.collection("users");
         const AllIfThenInfo = firestore.collection("itList");
 
@@ -49,7 +47,7 @@ export const remindIfThenNotification12 = functions
         }
 
         usersSnapshot.forEach(async (doc) => {
-            // Functionsのログにユーザーのメールアドレスとトークンが表示されてる
+            // Functionsのログにユーザーのメールアドレスとトークンを表示
             console.log(doc.id, "=>", doc.data());
             console.log(doc.data()["postAt"]);
             const tokens = doc.data()["tokens"];
